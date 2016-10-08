@@ -1,0 +1,4 @@
+[vigilant-octo]
+origin = https://github.com/r00m/vigilant-octo
+directory = /var/www/vigilant-octo.org
+command = supervisorctl restart vigilant-octo

@@ -3,23 +3,18 @@ import subprocess
 import git
 from flask import Flask, request
 
+import config
+import exceptions
+
 app = Flask(__name__)
 
-REPOS = [
-    {
-        'origin': 'https://github.com/r00m/vigilant-octo-eureka',
-        'directory': '/var/www/stabule.lv/public_html/vigilant-octo-eureka',
-        'command': 'echo "Hello World!" >> test.txt',
-    }
-]
 
-
-@app.route('/', methods=['POST'])
+@app.route('/', methods=['GET','POST'])
 def deploy():
     payload = request.get_json()
     url = payload['repository']['url']
 
-    for repo in REPOS:
+    for repo in app.config['HAMMER_REPOSITORIES']:
         if repo['origin'] == url:
             pull(repo['directory'], repo['command'])
             break
@@ -45,4 +40,12 @@ def pull(directory, command):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    try:
+        app.config.update({
+            'HAMMER_VERSION': "1.0.0",
+            'HAMMER_REPOSITORIES': config.load(),
+        })
+        app.run(debug=True)
+    except exceptions.HammerException as e:
+        print(e)
+        exit(1)
