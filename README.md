@@ -1,5 +1,7 @@
 # Skilled Hammer
 
+[![Build Status](https://travis-ci.org/r00m/skilled-hammer.svg?branch=master)](https://travis-ci.org/r00m/skilled-hammer)
+
 Simple deployments via GitHub's Webhooks
 
 ---
