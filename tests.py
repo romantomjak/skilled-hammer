@@ -1,13 +1,13 @@
 import unittest
 
-import skilled_hammer
+from skilled_hammer import app
 
 
 class SkilledHammerTestCase(unittest.TestCase):
 
     def setUp(self):
-        skilled_hammer.app.config['TESTING'] = True
-        self.app = skilled_hammer.app.test_client()
+        app.config['TESTING'] = True
+        self.app = app.test_client()
 
     def test_only_post_allowed(self):
         response = self.app.get('/')
