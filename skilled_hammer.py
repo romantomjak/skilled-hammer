@@ -5,14 +5,27 @@ from flask import Flask, request
 
 import config
 import exceptions
+from utils import valid_github_http_headers
 
 app = Flask(__name__)
 
 
-@app.route('/', methods=['GET','POST'])
+@app.route('/', methods=['POST'])
 def deploy():
+    if not valid_github_http_headers(request.headers):
+        raise exceptions.SuspiciousOperation("Invalid HTTP headers")
+
     payload = request.get_json()
+
+    if not payload \
+            or 'repository' not in payload \
+            or 'url' not in payload['repository']:
+        raise exceptions.SuspiciousOperation("Invalid payload")
+
     url = payload['repository']['url']
+
+    if url not in app.config['HAMMER_REPOSITORIES']:
+        raise exceptions.UnknownRepository("Unknown repository")
 
     for repo in app.config['HAMMER_REPOSITORIES']:
         if repo['origin'] == url:
