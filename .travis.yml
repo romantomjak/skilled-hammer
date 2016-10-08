@@ -8,6 +8,6 @@ python:
   - "3.5"
 matrix:
   allow_failures:
-    - python: "3.2"
+    - python: "3.2"  # because of GitPython
 install: "pip install -r requirements.txt"
 script: python tests.py
