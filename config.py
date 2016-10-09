@@ -1,4 +1,7 @@
-import configparser
+try:
+    import configparser
+except:
+    import ConfigParser as configparser  # python2
 
 import exceptions
 
