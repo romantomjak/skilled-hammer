@@ -30,6 +30,12 @@ all sorted!
 
 ## Running
 
+Copy example configuration and adjust it to your needs:
+
+```
+$ cp repositories.conf.example repositories.conf
+```
+
 For testing purposes you can use Flask's built-in development server:
 
 ```
