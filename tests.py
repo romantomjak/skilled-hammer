@@ -1,8 +1,8 @@
 import json
 import unittest
 
-import skilled_hammer
-import exceptions
+from skilled_hammer import exceptions
+from main import app
 
 
 class SkilledHammerTestCase(unittest.TestCase):
@@ -15,7 +15,7 @@ class SkilledHammerTestCase(unittest.TestCase):
             'HTTP_X_GITHUB_SIGNATURE': 'rand'
         }
 
-        skilled_hammer.app.config.update({
+        app.config.update({
             'TESTING': True,
             'HAMMER_VERSION': "1.0.0",
             'HAMMER_REPOSITORIES': [
@@ -26,7 +26,7 @@ class SkilledHammerTestCase(unittest.TestCase):
                 }
             ],
         })
-        self.app = skilled_hammer.app.test_client()
+        self.app = app.test_client()
 
     def test_only_post_allowed(self):
         response = self.app.get('/')

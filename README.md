@@ -8,6 +8,7 @@ Simple deployments via GitHub's Webhooks
 
 ## Requirements
 
+* Python 2.x or 3.x
 * Flask
 * GitPython
 * Gunicorn (optional)
@@ -39,7 +40,7 @@ $ cp repositories.conf.example repositories.conf
 For testing purposes you can use Flask's built-in development server:
 
 ```
-$ python3 skilled_hammer.py
+$ python main.py
 ```
 
 and navigate to http://127.0.0.1:5000, to see that it worked and GET method is not allowed :sweat_smile:

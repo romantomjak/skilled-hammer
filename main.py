@@ -3,9 +3,8 @@ import subprocess
 import git
 from flask import Flask, request
 
-import config
-import exceptions
-from utils import valid_github_http_headers
+from skilled_hammer import config, exceptions
+from skilled_hammer.utils import valid_github_http_headers
 
 app = Flask(__name__)
 
