@@ -19,7 +19,7 @@ I say optional because they are not required to actually run the app, but they a
 
 ## Security
 
-All incoming requests are validated against GitHub's Webhook guidelines.
+All incoming requests are validated according to [GitHub's Webhook guidelines](https://developer.github.com/webhooks/#payloads).
 
 ## Installation
 
