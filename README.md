@@ -21,6 +21,20 @@ I say optional because they are not required to actually run the app, but they a
 
 All incoming requests are validated according to [GitHub's Webhook guidelines](https://developer.github.com/webhooks/#payloads).
 
+## Why would I use this?
+
+I don't know mate. I use it for automated deployments when I push my code to GitHub. Github then calls the URL where `Skilled Hammer` is listening on and it then takes care of pulling latest changes and running any additional commands like compiling sass, applying database migrations, copying static files or restarting services.
+
+## How do I add a Webhook?
+
+Go to the repository `Settings`, in the left side menu click on `Webhooks` and then click on `Add webhook` button.
+
+The interesting bits here are:
+- Payload URL - that's where `Skilled Hammer` is listening on
+- Secret - this proves that request actually originated from GitHub's servers
+
+Both need to be filled out!
+
 ## Installation
 
 Easy mate, clone the repo and run:
