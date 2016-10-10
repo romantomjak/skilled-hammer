@@ -79,6 +79,19 @@ class SkilledHammerTestCase(unittest.TestCase):
         with self.assertRaises(exceptions.UnknownRepository):
             self.app.post('/', data=json.dumps(payload), headers=self.CLIENT_HEADERS, content_type='application/json')
 
+    def test_no_repositories(self):
+        app.config.update({
+            'HAMMER_REPOSITORIES': [],
+        })
+
+        payload = {
+            'repository': {
+                'url': 'https://github.com/baxterthehacker/public-repo'
+            }
+        }
+        with self.assertRaises(exceptions.UnknownRepository):
+            self.app.post('/', data=json.dumps(payload), headers=self.CLIENT_HEADERS, content_type='application/json')
+
 
 if __name__ == '__main__':
     unittest.main()

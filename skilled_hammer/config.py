@@ -1,7 +1,7 @@
 try:
     import configparser
 except:
-    import ConfigParser as configparser  # python2
+    import ConfigParser as configparser  # Python 2
 
 from . import exceptions
 
