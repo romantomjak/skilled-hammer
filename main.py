@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 import git
@@ -8,10 +9,20 @@ from skilled_hammer.utils import valid_github_http_headers
 
 app = Flask(__name__)
 
+try:
+    app.config.update({
+        'HAMMER_SECRET': os.environ('HAMMER_SECRET', None),
+        'HAMMER_VERSION': "1.0.0",
+        'HAMMER_REPOSITORIES': config.load(),
+    })
+except exceptions.HammerException as e:
+    print(e)
+    exit(1)
+
 
 @app.route('/', methods=['POST'])
 def deploy():
-    if not valid_github_http_headers(request.headers):
+    if not valid_github_http_headers(request):
         raise exceptions.SuspiciousOperation("Invalid HTTP headers")
 
     payload = request.get_json()
@@ -52,12 +63,4 @@ def pull(directory, command):
 
 
 if __name__ == "__main__":
-    try:
-        app.config.update({
-            'HAMMER_VERSION': "1.0.0",
-            'HAMMER_REPOSITORIES': config.load(),
-        })
-        app.run(debug=True)
-    except exceptions.HammerException as e:
-        print(e)
-        exit(1)
+    app.run(debug=True)
