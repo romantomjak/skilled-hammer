@@ -16,19 +16,6 @@ class SkilledHammerTestCase(unittest.TestCase):
             'HTTP_X_GITHUB_EVENT': 'push',
             'HTTP_X_GITHUB_SIGNATURE': 'rand'
         }
-
-        app.config.update({
-            'TESTING': True,
-            'HAMMER_SECRET': b'testkey123',
-            'HAMMER_VERSION': "1.0.0",
-            'HAMMER_REPOSITORIES': [
-                {
-                    'origin': 'https://github.com/r00m/vigilant-octo',
-                    'directory': '/var/www/vigilant-octo.org',
-                    'command': 'supervisorctl restart vigilant-octo',
-                }
-            ],
-        })
         self.app = app.test_client()
 
     def test_only_post_allowed(self):
@@ -80,6 +67,7 @@ class SkilledHammerTestCase(unittest.TestCase):
             }
         }
 
+        # sign payload
         headers = self.CLIENT_HEADERS
         headers['HTTP_X_GITHUB_SIGNATURE'] = hmac.new(app.config['HAMMER_SECRET'], json.dumps(payload).encode('utf-8'), hashlib.sha1).hexdigest()
 
@@ -97,6 +85,7 @@ class SkilledHammerTestCase(unittest.TestCase):
             }
         }
 
+        # sign payload
         headers = self.CLIENT_HEADERS
         headers['HTTP_X_GITHUB_SIGNATURE'] = hmac.new(app.config['HAMMER_SECRET'], json.dumps(payload).encode('utf-8'), hashlib.sha1).hexdigest()
 

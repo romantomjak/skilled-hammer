@@ -3,8 +3,6 @@ try:
 except:
     import ConfigParser as configparser  # Python 2
 
-from . import exceptions
-
 parser = configparser.ConfigParser()
 
 
@@ -24,6 +22,7 @@ def load(file="repositories.conf"):
             repositories[data['origin']] = data
         return repositories
     except configparser.NoOptionError as e:
-        raise exceptions.MissingOptionError("Missing required option '{0}' in '{1}' repo".format(e.args[0], e.args[1]))
+        print("Missing required option '{0}' in '{1}' repo".format(e.args[0], e.args[1]))
     except configparser.Error as e:
-        raise exceptions.ConfigurationSyntaxError(e.message)
+        print(e.message)
+    exit(1)

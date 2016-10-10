@@ -1,25 +1,15 @@
-import os
 import subprocess
 
 import git
 from flask import Flask, request
 
-from skilled_hammer import config, exceptions
+from skilled_hammer import exceptions
 from skilled_hammer.utils import valid_github_http_headers
 
 app = Flask(__name__)
-
-try:
-    app.config.update({
-        'HAMMER_SECRET': os.environ.get('HAMMER_SECRET', None),
-        'HAMMER_VERSION': "1.0.0",
-        'HAMMER_REPOSITORIES': config.load(),
-    })
-    if not app.config['HAMMER_SECRET']:
-        raise exceptions.MissingSecret("Did you forget to define HAMMER_SECRET environment variable?")
-except exceptions.HammerException as e:
-    print(e)
-    exit(1)
+app.config.from_object('skilled_hammer.settings')
+app.config.from_envvar('HAMMER_SETTINGS', silent=True)
+app.config['HAMMER_SECRET'] or (print("Did you forget to define HAMMER_SECRET environment variable?"), exit(1))
 
 
 @app.route('/', methods=['POST'])
