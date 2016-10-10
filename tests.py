@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 import json
 import unittest
 
@@ -9,7 +11,7 @@ class SkilledHammerTestCase(unittest.TestCase):
 
     def setUp(self):
         self.CLIENT_HEADERS = {
-            'HTTP_X_GITHUB_DELIVERY': 'some hash',
+            'HTTP_X_GITHUB_DELIVERY': 'unique id for this delivery',
             'HTTP_USER_AGENT': 'GitHub-Hookshot/buildno',
             'HTTP_X_GITHUB_EVENT': 'push',
             'HTTP_X_GITHUB_SIGNATURE': 'rand'
@@ -17,6 +19,7 @@ class SkilledHammerTestCase(unittest.TestCase):
 
         app.config.update({
             'TESTING': True,
+            'HAMMER_SECRET': b'testkey123',
             'HAMMER_VERSION': "1.0.0",
             'HAMMER_REPOSITORIES': [
                 {
@@ -76,8 +79,12 @@ class SkilledHammerTestCase(unittest.TestCase):
                 'url': 'https://github.com/baxterthehacker/public-repo'
             }
         }
+
+        headers = self.CLIENT_HEADERS
+        headers['HTTP_X_GITHUB_SIGNATURE'] = hmac.new(app.config['HAMMER_SECRET'], json.dumps(payload).encode('utf-8'), hashlib.sha1).hexdigest()
+
         with self.assertRaises(exceptions.UnknownRepository):
-            self.app.post('/', data=json.dumps(payload), headers=self.CLIENT_HEADERS, content_type='application/json')
+            self.app.post('/', data=json.dumps(payload), headers=headers, content_type='application/json')
 
     def test_no_repositories(self):
         app.config.update({
@@ -89,6 +96,10 @@ class SkilledHammerTestCase(unittest.TestCase):
                 'url': 'https://github.com/baxterthehacker/public-repo'
             }
         }
+
+        headers = self.CLIENT_HEADERS
+        headers['HTTP_X_GITHUB_SIGNATURE'] = hmac.new(app.config['HAMMER_SECRET'], json.dumps(payload).encode('utf-8'), hashlib.sha1).hexdigest()
+
         with self.assertRaises(exceptions.UnknownRepository):
             self.app.post('/', data=json.dumps(payload), headers=self.CLIENT_HEADERS, content_type='application/json')
 

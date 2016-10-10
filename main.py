@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 try:
     app.config.update({
-        'HAMMER_SECRET': os.environ('HAMMER_SECRET', None),
+        'HAMMER_SECRET': os.environ.get('HAMMER_SECRET', b''),
         'HAMMER_VERSION': "1.0.0",
         'HAMMER_REPOSITORIES': config.load(),
     })
