@@ -11,10 +11,12 @@ app = Flask(__name__)
 
 try:
     app.config.update({
-        'HAMMER_SECRET': os.environ.get('HAMMER_SECRET', b''),
+        'HAMMER_SECRET': os.environ.get('HAMMER_SECRET', None),
         'HAMMER_VERSION': "1.0.0",
         'HAMMER_REPOSITORIES': config.load(),
     })
+    if not app.config['HAMMER_SECRET']:
+        raise exceptions.MissingSecret("Did you forget to define HAMMER_SECRET environment variable?")
 except exceptions.HammerException as e:
     print(e)
     exit(1)
