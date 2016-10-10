@@ -17,6 +17,10 @@ Simple deployments via GitHub's Webhooks
 
 I say optional because they are not required to actually run the app, but they are needed when you deploy it in production.
 
+## Security
+
+All incoming requests are validated against GitHub's Webhook guidelines.
+
 ## Installation
 
 Easy mate, clone the repo and run:

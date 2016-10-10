@@ -44,6 +44,7 @@ class SkilledHammerTestCase(unittest.TestCase):
         response = self.app.patch('/')
         self.assertEqual(response.status_code, 405)
 
+        # POST is treated differently as it will trigger other security checks
         with self.assertRaises(exceptions.SuspiciousOperation):
             response = self.app.post('/')
             self.assertEqual(response.status_code, 405)
