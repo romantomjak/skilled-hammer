@@ -4,11 +4,11 @@ from flask import Flask, request
 
 from skilled_hammer import repositories
 from skilled_hammer import exceptions
-from skilled_hammer.utils import valid_github_http_headers, pull
+from skilled_hammer.utils import valid_github_http_headers, pull, random_secret
 
 app = Flask(__name__)
 app.config.update({
-    'HAMMER_SECRET': os.environ.get('HAMMER_SECRET', None),
+    'HAMMER_SECRET': os.environ.get('HAMMER_SECRET', random_secret()),
     'HAMMER_VERSION': "1.0.0",
     'HAMMER_REPOSITORIES': repositories.load(),
 })

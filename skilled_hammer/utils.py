@@ -1,6 +1,8 @@
 import hashlib
 import hmac
 import subprocess
+import string
+import random
 
 import git
 
@@ -19,7 +21,7 @@ def valid_github_http_headers(request):
         return False
     else:
         from main import app
-        hmac_digest = hmac.new(app.config['HAMMER_SECRET'], request.data, hashlib.sha1).hexdigest()
+        hmac_digest = hmac.new(bytes(app.config['HAMMER_SECRET'], 'utf-8'), request.data, hashlib.sha1).hexdigest()
         if hmac_digest != request.headers['HTTP_X_GITHUB_SIGNATURE']:
             return False
 
@@ -41,3 +43,7 @@ def pull(directory, command):
             subprocess.call(command, shell=True, cwd=directory)
     except Exception as e:
         print(e)
+
+
+def random_secret():
+    return ''.join([random.choice(string.printable) for _ in range(0, 20)])

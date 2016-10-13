@@ -6,6 +6,18 @@ import unittest
 from skilled_hammer import exceptions
 from main import app
 
+# settings specific to testing
+app.config.update({
+    'TESTING': True,
+    'HAMMER_REPOSITORIES': [
+        {
+            'origin': 'https://github.com/r00m/vigilant-octo',
+            'directory': '/var/www/vigilant-octo.org',
+            'command': 'supervisorctl restart vigilant-octo',
+        },
+    ],
+})
+
 
 class SkilledHammerTestCase(unittest.TestCase):
 
@@ -17,6 +29,12 @@ class SkilledHammerTestCase(unittest.TestCase):
             'HTTP_X_GITHUB_SIGNATURE': 'rand'
         }
         self.app = app.test_client()
+
+    def sign(self, payload):
+        self.CLIENT_HEADERS['HTTP_X_GITHUB_SIGNATURE'] = hmac.new(bytes(app.config['HAMMER_SECRET'], 'utf-8'),
+                                                                  json.dumps(payload).encode('utf-8'),
+                                                                  hashlib.sha1)\
+            .hexdigest()
 
     def test_only_post_allowed(self):
         response = self.app.get('/')
@@ -67,12 +85,10 @@ class SkilledHammerTestCase(unittest.TestCase):
             }
         }
 
-        # sign payload
-        headers = self.CLIENT_HEADERS
-        headers['HTTP_X_GITHUB_SIGNATURE'] = hmac.new(app.config['HAMMER_SECRET'], json.dumps(payload).encode('utf-8'), hashlib.sha1).hexdigest()
+        self.sign(payload)
 
         with self.assertRaises(exceptions.UnknownRepository):
-            self.app.post('/', data=json.dumps(payload), headers=headers, content_type='application/json')
+            self.app.post('/', data=json.dumps(payload), headers=self.CLIENT_HEADERS, content_type='application/json')
 
     def test_no_repositories(self):
         app.config.update({
@@ -85,9 +101,7 @@ class SkilledHammerTestCase(unittest.TestCase):
             }
         }
 
-        # sign payload
-        headers = self.CLIENT_HEADERS
-        headers['HTTP_X_GITHUB_SIGNATURE'] = hmac.new(app.config['HAMMER_SECRET'], json.dumps(payload).encode('utf-8'), hashlib.sha1).hexdigest()
+        self.sign(payload)
 
         with self.assertRaises(exceptions.UnknownRepository):
             self.app.post('/', data=json.dumps(payload), headers=self.CLIENT_HEADERS, content_type='application/json')
