@@ -1,6 +1,7 @@
 import os
+import subprocess
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
 from skilled_hammer import repositories
 from skilled_hammer import exceptions
@@ -31,12 +32,15 @@ def deploy():
     if url not in app.config['HAMMER_REPOSITORIES']:
         raise exceptions.UnknownRepository("Unknown repository")
 
+    pull_succeeded = False
     for repo in app.config['HAMMER_REPOSITORIES']:
         if repo['origin'] == url:
-            pull(repo['directory'], repo['command'])
+            pull_succeeded = pull(repo['directory'])
+            if pull_succeeded and 'command' in repo:
+                subprocess.call(repo['command'], shell=True, cwd=repo['directory'])
             break
 
-    return ""
+    return jsonify({'status': pull_succeeded})
 
 
 if __name__ == "__main__":
