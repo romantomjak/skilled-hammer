@@ -22,7 +22,7 @@ def valid_github_http_headers(request):
     else:
         from main import app
         hmac_digest = hmac.new(bytes(app.config['HAMMER_SECRET'], 'utf-8'), request.data, hashlib.sha1).hexdigest()
-        if hmac_digest != request.headers['HTTP_X_GITHUB_SIGNATURE']:
+        if hmac_digest != request.headers['HTTP_X_GITHUB_SIGNATURE'][5:]:
             return False
 
     return True

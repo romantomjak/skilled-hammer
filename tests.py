@@ -26,15 +26,14 @@ class SkilledHammerTestCase(unittest.TestCase):
             'HTTP_X_GITHUB_DELIVERY': 'unique id for this delivery',
             'HTTP_USER_AGENT': 'GitHub-Hookshot/buildno',
             'HTTP_X_GITHUB_EVENT': 'push',
-            'HTTP_X_GITHUB_SIGNATURE': 'rand'
+            'HTTP_X_GITHUB_SIGNATURE': 'sha1=rand'
         }
         self.app = app.test_client()
 
     def sign(self, payload):
-        self.CLIENT_HEADERS['HTTP_X_GITHUB_SIGNATURE'] = hmac.new(bytes(app.config['HAMMER_SECRET'], 'utf-8'),
-                                                                  json.dumps(payload).encode('utf-8'),
-                                                                  hashlib.sha1)\
+        signature = hmac.new(bytes(app.config['HAMMER_SECRET'], 'utf-8'), json.dumps(payload).encode('utf-8'), hashlib.sha1)\
             .hexdigest()
+        self.CLIENT_HEADERS['HTTP_X_GITHUB_SIGNATURE'] = "sha1={0}".format(signature)
 
     def test_only_post_allowed(self):
         response = self.app.get('/')
