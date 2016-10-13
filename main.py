@@ -1,11 +1,14 @@
+import logging
 import os
 import subprocess
 
 from flask import Flask, request, jsonify
 
-from skilled_hammer import repositories
-from skilled_hammer import exceptions
+from skilled_hammer import repositories, exceptions, log
 from skilled_hammer.utils import valid_github_http_headers, pull, random_secret
+
+log.setup()
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config.update({
@@ -17,30 +20,33 @@ app.config.update({
 
 @app.route('/', methods=['POST'])
 def deploy():
-    if not valid_github_http_headers(request):
-        raise exceptions.SuspiciousOperation("Invalid HTTP headers")
+    try:
+        if not valid_github_http_headers(request):
+            raise exceptions.SuspiciousOperation("Invalid HTTP headers")
 
-    payload = request.get_json()
+        payload = request.get_json()
 
-    if not payload \
-            or 'repository' not in payload \
-            or 'url' not in payload['repository']:
-        raise exceptions.SuspiciousOperation("Invalid payload")
+        if not payload \
+                or 'repository' not in payload \
+                or 'url' not in payload['repository']:
+            raise exceptions.SuspiciousOperation("Invalid payload")
 
-    url = payload['repository']['url']
+        url = payload['repository']['url']
 
-    if url not in app.config['HAMMER_REPOSITORIES']:
-        raise exceptions.UnknownRepository("Unknown repository")
+        if url not in app.config['HAMMER_REPOSITORIES']:
+            raise exceptions.UnknownRepository("Unknown repository")
 
-    pull_succeeded = False
-    for _, repo in app.config['HAMMER_REPOSITORIES'].items():
-        if repo['origin'] == url:
-            pull_succeeded = pull(repo['directory'])
-            if pull_succeeded and 'command' in repo:
-                subprocess.call(repo['command'], shell=True, cwd=repo['directory'])
-            break
+        pull_succeeded = False
+        for _, repo in app.config['HAMMER_REPOSITORIES'].items():
+            if repo['origin'] == url:
+                pull_succeeded = pull(repo['directory'])
+                if pull_succeeded and 'command' in repo:
+                    subprocess.call(repo['command'], shell=True, cwd=repo['directory'])
+                break
 
-    return jsonify({'status': pull_succeeded})
+        return jsonify({'status': pull_succeeded})
+    except exceptions.HammerException as e:
+        logger.fatal(e)
 
 
 if __name__ == "__main__":
