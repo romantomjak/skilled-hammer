@@ -21,9 +21,13 @@ I say optional because they are not required to actually run the app, but they a
 
 All incoming requests are validated according to [GitHub's Webhook guidelines](https://developer.github.com/webhooks/#payloads).
 
-## Why would I use this?
+## Why?
 
-I don't know mate. I use it for automated deployments when I push my code to GitHub. Github then calls the URL where `Skilled Hammer` is listening on and it then takes care of pulling latest changes and running any additional commands like compiling sass, applying database migrations, copying static files or restarting services.
+I got sick of logging into the server, pulling code and running any additional commands thereafter.
+
+## How?
+
+When code is pushed to GitHub, GitHub then calls the URL where `Skilled Hammer` is listening on, which then takes care of pulling latest changes and running any additional commands like compiling sass, applying database migrations, copying static files or restarting services.
 
 ## How do I add a Webhook?
 
