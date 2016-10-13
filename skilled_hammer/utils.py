@@ -40,6 +40,8 @@ def pull(directory):
     try:
         # use correct permissions
         st = os.stat(directory)
+        logger.info("Will try to pull() as {0}:{1}".format(st.st_uid, st.st_gid))
+
         os.seteuid(st.st_uid)
         os.setegid(st.st_gid)
 
@@ -59,6 +61,7 @@ def pull(directory):
         return False
     finally:
         # restore root permissions
+        logger.info("Restoring root permissions")
         os.seteuid(0)
         os.setegid(0)
 
