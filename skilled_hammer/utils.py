@@ -8,21 +8,21 @@ import git
 
 
 def valid_github_http_headers(request):
-    if 'HTTP_X_GITHUB_DELIVERY' not in request.headers:
+    if 'X-Github-Delivery' not in request.headers:
         return False
 
-    if 'HTTP_USER_AGENT' not in request.headers or request.headers['HTTP_USER_AGENT'][:16] != 'GitHub-Hookshot/':
+    if 'User-Agent' not in request.headers or request.headers['User-Agent'][:16] != 'GitHub-Hookshot/':
         return False
 
-    if 'HTTP_X_GITHUB_EVENT' not in request.headers or request.headers['HTTP_X_GITHUB_EVENT'] != 'push':
+    if 'X-Github-Event' not in request.headers or request.headers['X-Github-Event'] != 'push':
         return False
 
-    if 'HTTP_X_HUB_SIGNATURE' not in request.headers:
+    if 'X-Hub-Signature' not in request.headers:
         return False
     else:
         from main import app
         hmac_digest = hmac.new(bytes(app.config['HAMMER_SECRET'], 'utf-8'), request.data, hashlib.sha1).hexdigest()
-        if hmac_digest != request.headers['HTTP_X_HUB_SIGNATURE'][5:]:
+        if hmac_digest != request.headers['X-Hub-Signature'][5:]:
             return False
 
     return True

@@ -23,17 +23,17 @@ class SkilledHammerTestCase(unittest.TestCase):
 
     def setUp(self):
         self.CLIENT_HEADERS = {
-            'HTTP_X_GITHUB_DELIVERY': 'unique id for this delivery',
-            'HTTP_USER_AGENT': 'GitHub-Hookshot/buildno',
-            'HTTP_X_GITHUB_EVENT': 'push',
-            'HTTP_X_HUB_SIGNATURE': 'sha1=rand'
+            'X_GITHUB_DELIVERY': 'unique id for this delivery',
+            'USER_AGENT': 'GitHub-Hookshot/buildno',
+            'X_GITHUB_EVENT': 'push',
+            'X_HUB_SIGNATURE': 'sha1=rand'
         }
         self.app = app.test_client()
 
     def sign(self, payload):
         signature = hmac.new(bytes(app.config['HAMMER_SECRET'], 'utf-8'), json.dumps(payload).encode('utf-8'), hashlib.sha1)\
             .hexdigest()
-        self.CLIENT_HEADERS['HTTP_X_HUB_SIGNATURE'] = "sha1={0}".format(signature)
+        self.CLIENT_HEADERS['X_HUB_SIGNATURE'] = "sha1={0}".format(signature)
 
     def test_only_post_allowed(self):
         response = self.app.get('/')
@@ -58,22 +58,22 @@ class SkilledHammerTestCase(unittest.TestCase):
 
     def test_github_headers(self):
         invalid_headers = self.CLIENT_HEADERS
-        invalid_headers.pop('HTTP_X_GITHUB_DELIVERY')
+        invalid_headers.pop('X_GITHUB_DELIVERY')
         with self.assertRaises(exceptions.SuspiciousOperation):
             self.app.post('/', headers=invalid_headers)
 
         invalid_headers = self.CLIENT_HEADERS
-        invalid_headers.pop('HTTP_USER_AGENT')
+        invalid_headers.pop('USER_AGENT')
         with self.assertRaises(exceptions.SuspiciousOperation):
             self.app.post('/', headers=invalid_headers)
 
         invalid_headers = self.CLIENT_HEADERS
-        invalid_headers.pop('HTTP_X_GITHUB_EVENT')
+        invalid_headers.pop('X_GITHUB_EVENT')
         with self.assertRaises(exceptions.SuspiciousOperation):
             self.app.post('/', headers=invalid_headers)
 
         invalid_headers = self.CLIENT_HEADERS
-        invalid_headers.pop('HTTP_X_HUB_SIGNATURE')
+        invalid_headers.pop('X_HUB_SIGNATURE')
         with self.assertRaises(exceptions.SuspiciousOperation):
             self.app.post('/', headers=invalid_headers)
 
