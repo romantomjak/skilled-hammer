@@ -40,7 +40,7 @@ def pull(directory):
     try:
         # use correct permissions
         st = os.stat(directory)
-        logger.info("Will try to pull as {0}:{1}".format(st.st_uid, st.st_gid))
+        logger.info("Pulling as {0}:{1}...".format(st.st_uid, st.st_gid))
 
         # order is important: after seteuid() call the effective UID isn't 0 anymore, so seteuid() will not be allowed
         os.setegid(st.st_uid)
@@ -50,13 +50,13 @@ def pull(directory):
         info = repo.remotes.origin.pull()[0]
 
         if info.flags & info.ERROR:
-            logger.error("Git pull failed: {0}".format(info.note))
+            logger.error("Pull failed: {0}".format(info.note))
             return False
         elif info.flags & info.REJECTED:
-            logger.error("Could not merge after git pull: {0}".format(info.note))
+            logger.error("Could not merge after pull: {0}".format(info.note))
             return False
         elif info.flags & info.HEAD_UPTODATE:
-            logger.error("Head is already up to date")
+            logger.info("Head is already up to date")
     except PermissionError:
         logger.error("Insufficient permissions to set uid/gid")
         return False
@@ -70,4 +70,6 @@ def pull(directory):
 
 
 def random_secret():
-    return ''.join([random.choice(string.printable) for _ in range(0, 20)])
+    secret = ''.join([random.choice(string.printable) for _ in range(0, 20)])
+    logger.info("HAMMER_SECRET environment variable was not set, so a random one was generated: {0}".format(secret))
+    return secret

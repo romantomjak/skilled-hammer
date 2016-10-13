@@ -41,12 +41,13 @@ def deploy():
             if repo['origin'] == url:
                 pull_succeeded = pull(repo['directory'])
                 if pull_succeeded and 'command' in repo:
+                    logger.info("Running command: {0}".format(repo['command']))
                     subprocess.call(repo['command'], shell=True, cwd=repo['directory'])
                 break
 
         return jsonify({'status': pull_succeeded})
     except exceptions.HammerException as e:
-        logger.fatal(e)
+        logger.error(e)
 
 
 if __name__ == "__main__":
