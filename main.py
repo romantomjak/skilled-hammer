@@ -1,15 +1,17 @@
-import subprocess
+import os
 
-import git
 from flask import Flask, request
 
+from skilled_hammer import repositories
 from skilled_hammer import exceptions
-from skilled_hammer.utils import valid_github_http_headers
+from skilled_hammer.utils import valid_github_http_headers, pull
 
 app = Flask(__name__)
-app.config.from_object('skilled_hammer.settings')
-app.config.from_envvar('HAMMER_SETTINGS', silent=True)
-app.config['HAMMER_SECRET'] or (print("Did you forget to define HAMMER_SECRET environment variable?"), exit(1))
+app.config.update({
+    'HAMMER_SECRET': os.environ.get('HAMMER_SECRET', None),
+    'HAMMER_VERSION': "1.0.0",
+    'HAMMER_REPOSITORIES': repositories.load(),
+})
 
 
 @app.route('/', methods=['POST'])
@@ -35,23 +37,6 @@ def deploy():
             break
 
     return ""
-
-
-def pull(directory, command):
-    try:
-        repo = git.Repo(directory)
-        info = repo.remotes.origin.pull()[0]
-
-        if info.flags & info.ERROR:
-            print("Git pull failed: {0}".format(info.note))
-        elif info.flags & info.REJECTED:
-            print("Could not merge after git pull: {0}".format(info.note))
-        elif info.flags & info.HEAD_UPTODATE:
-            print("Head is already up to date")
-        else:
-            subprocess.call(command, shell=True, cwd=directory)
-    except Exception as e:
-        print(e)
 
 
 if __name__ == "__main__":

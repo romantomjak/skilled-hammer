@@ -6,13 +6,13 @@ except:
 parser = configparser.ConfigParser()
 
 
-def load(file="repositories.conf"):
+def load():
     """
     Attempts to load repository configuration
     """
     try:
         repositories = {}
-        parser.read(file)
+        parser.read("repositories.conf")
         for section in parser.sections():
             data = {
                 'directory': parser.get(section, 'directory'),

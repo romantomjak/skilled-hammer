@@ -1,5 +1,8 @@
 import hashlib
 import hmac
+import subprocess
+
+import git
 
 
 def valid_github_http_headers(request):
@@ -21,3 +24,20 @@ def valid_github_http_headers(request):
             return False
 
     return True
+
+
+def pull(directory, command):
+    try:
+        repo = git.Repo(directory)
+        info = repo.remotes.origin.pull()[0]
+
+        if info.flags & info.ERROR:
+            print("Git pull failed: {0}".format(info.note))
+        elif info.flags & info.REJECTED:
+            print("Could not merge after git pull: {0}".format(info.note))
+        elif info.flags & info.HEAD_UPTODATE:
+            print("Head is already up to date")
+        else:
+            subprocess.call(command, shell=True, cwd=directory)
+    except Exception as e:
+        print(e)
