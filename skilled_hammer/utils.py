@@ -40,10 +40,11 @@ def pull(directory):
     try:
         # use correct permissions
         st = os.stat(directory)
-        logger.info("Will try to pull() as {0}:{1}".format(st.st_uid, st.st_gid))
+        logger.info("Will try to pull as {0}:{1}".format(st.st_uid, st.st_gid))
 
-        os.seteuid(st.st_uid)
-        os.setegid(st.st_gid)
+        # order is important: after seteuid() call the effective UID isn't 0 anymore, so seteuid() will not be allowed
+        os.setegid(st.st_uid)
+        os.seteuid(st.st_gid)
 
         repo = git.Repo(directory)
         info = repo.remotes.origin.pull()[0]
@@ -56,14 +57,14 @@ def pull(directory):
             return False
         elif info.flags & info.HEAD_UPTODATE:
             logger.error("Head is already up to date")
-    except Exception as e:
-        logger.error(e)
+    except PermissionError:
+        logger.error("Insufficient permissions to set uid/gid")
         return False
     finally:
         # restore root permissions
         logger.info("Restoring root permissions")
-        os.seteuid(0)
         os.setegid(0)
+        os.seteuid(0)
 
     return True
 
