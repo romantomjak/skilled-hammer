@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import os
 import string
 import random
 
@@ -29,6 +30,11 @@ def valid_github_http_headers(request):
 
 def pull(directory):
     try:
+        # use correct permissions
+        st = os.stat(directory)
+        os.seteuid(st.st_uid)
+        os.setegid(st.st_gid)
+
         repo = git.Repo(directory)
         info = repo.remotes.origin.pull()[0]
 
@@ -43,6 +49,10 @@ def pull(directory):
     except Exception as e:
         print(e)
         return False
+    finally:
+        # restore root permissions
+        os.seteuid(0)
+        os.setegid(0)
 
     return True
 

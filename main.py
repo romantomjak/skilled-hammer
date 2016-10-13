@@ -33,7 +33,7 @@ def deploy():
         raise exceptions.UnknownRepository("Unknown repository")
 
     pull_succeeded = False
-    for repo in app.config['HAMMER_REPOSITORIES']:
+    for _, repo in app.config['HAMMER_REPOSITORIES'].items():
         if repo['origin'] == url:
             pull_succeeded = pull(repo['directory'])
             if pull_succeeded and 'command' in repo:
