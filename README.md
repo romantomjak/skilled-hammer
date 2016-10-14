@@ -8,7 +8,7 @@ Simple deployments via GitHub's Webhooks
 
 ## Requirements
 
-* Python 2.7, 3.2, 3.3, 3.4, or 3.5
+* Python 2.7 or 3.5
 * Flask
 * GitPython
 * Gunicorn (optional)
@@ -16,6 +16,8 @@ Simple deployments via GitHub's Webhooks
 * NGINX (optional)
 
 I say optional because they are not required to actually run the app, but they are needed when you deploy it in production.
+
+For configuration samples see the `config` folder.
 
 ## Security
 
