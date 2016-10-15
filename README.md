@@ -17,7 +17,7 @@ Simple deployments via GitHub's Webhooks
 
 I say optional because they are not required to actually run the app, but they are needed when you deploy it in production.
 
-For configuration samples see the `config` folder.
+For configuration examples see the `config` folder.
 
 ## Security
 
@@ -58,7 +58,7 @@ all sorted!
 Copy example configuration and adjust it to your needs:
 
 ```
-$ cp repositories.conf.example repositories.conf
+$ cp config/repositories.conf.example config/repositories.conf
 ```
 
 For testing purposes you can use Flask's built-in development server:
