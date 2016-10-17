@@ -176,4 +176,4 @@ ENV/
 
 
 # Project specific
-config/repositories.conf
+conf/repositories.conf
