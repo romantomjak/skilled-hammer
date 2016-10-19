@@ -38,7 +38,7 @@ def pull(directory):
     try:
         # use correct permissions
         st = os.stat(directory)
-        logger.error("Pulling as {0}:{1}...".format(st.st_uid, st.st_gid))
+        logger.info("Pulling as {0}:{1}...".format(st.st_uid, st.st_gid))
 
         # order is important: after seteuid() call the effective UID isn't 0 anymore, so seteuid() will not be allowed
         os.setegid(st.st_uid)
@@ -54,13 +54,13 @@ def pull(directory):
             logger.error("Could not merge after pull: {0}".format(info.note))
             return False
         elif info.flags & info.HEAD_UPTODATE:
-            logger.error("Head is already up to date")
+            logger.info("Head is already up to date")
     except PermissionError:
         logger.error("Insufficient permissions to set uid/gid")
         return False
     finally:
         # restore root permissions
-        logger.error("Restoring root permissions")
+        logger.info("Restoring root permissions")
         os.setegid(0)
         os.seteuid(0)
 
