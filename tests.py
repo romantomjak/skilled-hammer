@@ -33,7 +33,7 @@ class SkilledHammerTestCase(unittest.TestCase):
         }
 
     def sign(self, payload):
-        signature = hmac.new(bytes(app.config['HAMMER_SECRET'], 'utf-8'), json.dumps(payload).encode('utf-8'), hashlib.sha1)\
+        signature = hmac.new(bytearray(app.config['HAMMER_SECRET'], 'utf-8'), json.dumps(payload).encode('utf-8'), hashlib.sha1)\
             .hexdigest()
         self.CLIENT_HEADERS['X-Hub-Signature'] = "sha1={0}".format(signature)
 

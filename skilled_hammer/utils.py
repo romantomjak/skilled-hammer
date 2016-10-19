@@ -26,7 +26,7 @@ def valid_github_http_headers(request):
         if not app.config['HAMMER_SECRET']:
             logger.error("Webhook was configured to use a Secret, but 'HAMMER_SECRET' environment variable was not set")
             return False
-        hmac_digest = hmac.new(bytes(app.config['HAMMER_SECRET'], 'utf-8'), request.data, hashlib.sha1).hexdigest()
+        hmac_digest = hmac.new(bytearray(app.config['HAMMER_SECRET'], 'utf-8'), request.data, hashlib.sha1).hexdigest()
         if hmac_digest != request.headers['X-Hub-Signature'][5:]:
             logger.error("'X-Hub-Signature' did not match '{0}'".format(hmac_digest))
             return False
