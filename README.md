@@ -17,11 +17,13 @@ Simple deployments via GitHub's Webhooks
 
 I say optional because they are not required to actually run the app, but they are needed when you deploy it in production.
 
-For configuration examples see the `config` folder.
+For configuration examples see the `conf` folder.
 
 ## Security
 
 All incoming requests are validated according to [GitHub's Webhook guidelines](https://developer.github.com/webhooks/#payloads).
+
+**NB!** For increased security always setup `Secret` when creating a Webhook
 
 ## Why?
 
@@ -58,18 +60,18 @@ all sorted!
 Copy example configuration and adjust it to your needs:
 
 ```
-$ cp config/repositories.conf.example config/repositories.conf
+$ cp conf/repositories.conf.example conf/repositories.conf
 ```
 
 For testing purposes you can use Flask's built-in development server:
 
 ```
-$ python main.py
+$ python app.py
 ```
 
 and navigate to http://127.0.0.1:5000, to see that it worked and GET method is not allowed :sweat_smile:
 
-**NB!** For production deployments set `DEBUG = False`
+**NB!** For production deployments set the `DEBUG` environment variable to `False`
 
 **NB!** For production deployments you will need to setup a WSGI server that can talk to an HTTP server. Here's a [tutorial on setting up Gunicorn, Supervisor and NGINX](https://r00m.wordpress.com/2016/03/05/deploying-flask-nginx-gunicorn-supervisor-for-the-first-time/).
 
