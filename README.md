@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/r00m/skilled-hammer.svg?branch=master)](https://travis-ci.org/r00m/skilled-hammer)
 
-Simple deployments via GitHub's Webhooks
+Simple GitHub/Bitbucket Webhook deployments
 
 ---
 
@@ -21,9 +21,9 @@ For configuration examples see the `conf` folder.
 
 ## Security
 
-All incoming requests are validated according to [GitHub's Webhook guidelines](https://developer.github.com/webhooks/#payloads).
+All incoming requests are validated according to [GitHub's Webhook guidelines](https://developer.github.com/webhooks/#payloads) or [Bitbucket's Event Payloads](https://confluence.atlassian.com/bitbucket/event-payloads-740262817.html).
 
-**NB!** For increased security always setup `Secret` when creating a Webhook
+**NB!** For projects hosted on GitHub, always setup `Secret` when creating a Webhook, it provides additional layer of security.
 
 ## Why?
 
@@ -31,9 +31,11 @@ I got sick of logging into the server, pulling code and running any additional c
 
 ## How?
 
-When code is pushed to GitHub, GitHub then calls the URL where `Skilled Hammer` is listening on, which then takes care of pulling latest changes and running any additional commands like compiling sass, applying database migrations, copying static files or restarting services.
+When you push code to GitHub/Bitbucket, a HTTP call is made to the URL where `Skilled Hammer` is listening on, which then takes care of pulling latest changes and running any additional commands like compiling sass, applying database migrations, copying static files or restarting services.
 
 ## How do I add a Webhook?
+
+### GitHub
 
 Go to the repository `Settings`, in the left side menu click on `Webhooks` and then click on `Add webhook` button.
 
@@ -42,6 +44,10 @@ The interesting bits here are:
 - Secret - this proves that request actually originated from GitHub's servers
 
 Both need to be filled out!
+
+### Bitbucket
+
+Go to the repository `Settings`, in the secondary menu click on `Webhooks` and then click on `Add webhook` button.
 
 ## Installation
 

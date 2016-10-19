@@ -77,8 +77,10 @@ def valid_github_http_headers(request):
 
 
 def pull(directory):
+    """
+    Pulls latest changes with the user rights that owns the folder
+    """
     try:
-        # use correct permissions
         st = os.stat(directory)
         logger.info("Pulling as {0}:{1}...".format(st.st_uid, st.st_gid))
 
@@ -101,7 +103,6 @@ def pull(directory):
         logger.error("Insufficient permissions to set uid/gid")
         return False
     finally:
-        # restore root permissions
         logger.info("Restoring root permissions")
         os.setegid(0)
         os.seteuid(0)

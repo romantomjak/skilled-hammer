@@ -24,14 +24,7 @@ def deploy():
         if not valid_http_headers(request):
             raise exceptions.SuspiciousOperation("Invalid HTTP headers")
 
-        payload = request.get_json()
-
-        if not payload \
-                or 'repository' not in payload \
-                or 'url' not in payload['repository']:
-            raise exceptions.SuspiciousOperation("Invalid payload")
-
-        url = payload['repository']['url']
+        url = repositories.repo_url_from_payload(request.get_json())
 
         if url not in app.config['HAMMER_REPOSITORIES']:
             raise exceptions.UnknownRepository("Unknown repository")

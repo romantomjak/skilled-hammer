@@ -1,3 +1,5 @@
+from skilled_hammer import exceptions
+
 try:
     import configparser
 except:
@@ -26,3 +28,23 @@ def load():
     except configparser.Error as e:
         print(e.message)
     exit(1)
+
+
+def repo_url_from_payload(payload):
+    """
+    Validates payload and returns repo url depending on where it's hosted
+    """
+    if not payload:
+        raise exceptions.SuspiciousOperation("Invalid payload")
+
+    if 'repository' in payload:
+        # github
+        if 'url' in payload['repository']:
+            return payload['repository']['url']
+        # bitbucket
+        if 'links' in payload['repository']\
+                and 'html' in payload['repository']['links']\
+                and 'href' in payload['repository']['links']['html']:
+            return payload['repository']['links']['html']['href']
+
+    raise exceptions.SuspiciousOperation("Invalid payload")
