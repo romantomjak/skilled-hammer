@@ -5,7 +5,7 @@ import logging
 from flask import Flask, request, jsonify
 
 from skilled_hammer import repositories, exceptions, log
-from skilled_hammer.utils import valid_github_http_headers, pull
+from skilled_hammer.utils import valid_http_headers, pull
 
 app = Flask(__name__)
 app.config.update({
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 @app.route('/', methods=['POST'])
 def deploy():
     try:
-        if not valid_github_http_headers(request):
+        if not valid_http_headers(request):
             raise exceptions.SuspiciousOperation("Invalid HTTP headers")
 
         payload = request.get_json()

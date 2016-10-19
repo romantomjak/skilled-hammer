@@ -8,13 +8,55 @@ import git
 logger = logging.getLogger(__name__)
 
 
+def valid_http_headers(request):
+    if 'User-Agent' not in request.headers:
+        logger.error("'User-Agent' is missing from http headers")
+        return False
+
+    if 'GitHub' in request.headers['User-Agent']:
+        logger.info("Validating GitHub Webhook")
+        return valid_github_http_headers(request)
+
+    if 'Bitbucket' in request.headers['User-Agent']:
+        logger.info("Validating Bitbucket Webhook")
+        return valid_bitbucket_http_headers(request)
+
+    logger.warning("Unknown GIT hosting provider")
+
+    return False
+
+
+def valid_bitbucket_http_headers(request):
+    if 'X-Event-Key' not in request.headers:
+        logger.error("'X-Event-Key' is missing from headers")
+        return False
+
+    if request.headers['User-Agent'][:19] != 'Bitbucket-Webhooks/':
+        logger.error("'User-Agent' has incorrect value ({0})".format(request.headers['User-Agent']))
+        return False
+
+    if 'X-Hook-UUID' not in request.headers:
+        logger.error("'X-Hook-UUID' is missing from headers")
+        return False
+
+    if 'X-Request-UUID' not in request.headers:
+        logger.error("'X-Request-UUID' is missing from headers")
+        return False
+
+    if 'X-Attempt-Number' not in request.headers:
+        logger.error("'X-Attempt-Number' is missing from headers")
+        return False
+
+    return True
+
+
 def valid_github_http_headers(request):
     if 'X-Github-Delivery' not in request.headers:
         logger.error("'X-Github-Delivery' is missing from headers")
         return False
 
-    if 'User-Agent' not in request.headers or request.headers['User-Agent'][:16] != 'GitHub-Hookshot/':
-        logger.error("'User-Agent' is missing from headers or has incorrect value ({0})".format(request.headers['User-Agent']))
+    if request.headers['User-Agent'][:16] != 'GitHub-Hookshot/':
+        logger.error("'User-Agent' has incorrect value ({0})".format(request.headers['User-Agent']))
         return False
 
     if 'X-Github-Event' not in request.headers or request.headers['X-Github-Event'] != 'push':
