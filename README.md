@@ -69,6 +69,8 @@ $ python main.py
 
 and navigate to http://127.0.0.1:5000, to see that it worked and GET method is not allowed :sweat_smile:
 
+**NB!** For production deployments set `DEBUG = False`
+
 **NB!** For production deployments you will need to setup a WSGI server that can talk to an HTTP server. Here's a [tutorial on setting up Gunicorn, Supervisor and NGINX](https://r00m.wordpress.com/2016/03/05/deploying-flask-nginx-gunicorn-supervisor-for-the-first-time/).
 
 ## Testing

@@ -17,19 +17,11 @@ def setup():
                 'class': 'logging.StreamHandler',
                 'formatter': 'verbose'
             },
-            'file': {
-                'level': 'DEBUG',
-                'class': 'logging.handlers.RotatingFileHandler',
-                'maxBytes': 10000000,
-                'backupCount': 5,
-                'filename': 'app.log',
-                'formatter': 'verbose',
-            },
         },
         'loggers': {
             '': {
-                'level': 'DEBUG',
-                'handlers': ['console', 'file'],
+                'level': 'INFO',
+                'handlers': ['console'],
             },
         },
     })

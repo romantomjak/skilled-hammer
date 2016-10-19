@@ -12,7 +12,7 @@ def load():
     """
     try:
         repositories = {}
-        parser.read("config/repositories.conf")
+        parser.read("conf/repositories.conf")
         for section in parser.sections():
             data = {
                 'directory': parser.get(section, 'directory'),

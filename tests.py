@@ -2,38 +2,40 @@ import hashlib
 import hmac
 import json
 import unittest
+import logging
 
-from skilled_hammer import exceptions
-from main import app
+from app import app
 
-# settings specific to testing
-app.config.update({
-    'TESTING': True,
-    'HAMMER_REPOSITORIES': [
-        {
-            'origin': 'https://github.com/r00m/vigilant-octo',
-            'directory': '/var/www/vigilant-octo.org',
-            'command': 'supervisorctl restart vigilant-octo',
-        },
-    ],
-})
+logging.disable(logging.CRITICAL)
 
 
 class SkilledHammerTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.CLIENT_HEADERS = {
-            'X_GITHUB_DELIVERY': 'unique id for this delivery',
-            'USER_AGENT': 'GitHub-Hookshot/buildno',
-            'X_GITHUB_EVENT': 'push',
-            'X_HUB_SIGNATURE': 'sha1=rand'
-        }
+        app.config.update({
+            'TESTING': True,
+            'HAMMER_REPOSITORIES': [
+                {
+                    'origin': 'https://github.com/r00m/vigilant-octo',
+                    'directory': '/var/www/vigilant-octo.org',
+                    'command': 'supervisorctl restart vigilant-octo',
+                },
+            ],
+            'HAMMER_SECRET': 'hammer-test-secret-123'
+        })
         self.app = app.test_client()
+
+        self.CLIENT_HEADERS = {
+            'X-Github-Delivery': 'unique id for this delivery',
+            'User-Agent': 'GitHub-Hookshot/buildno',
+            'X-Github-Event': 'push',
+            'X-Hub-Signature': 'sha1=rand'
+        }
 
     def sign(self, payload):
         signature = hmac.new(bytes(app.config['HAMMER_SECRET'], 'utf-8'), json.dumps(payload).encode('utf-8'), hashlib.sha1)\
             .hexdigest()
-        self.CLIENT_HEADERS['X_HUB_SIGNATURE'] = "sha1={0}".format(signature)
+        self.CLIENT_HEADERS['X-Hub-Signature'] = "sha1={0}".format(signature)
 
     def test_only_post_allowed(self):
         response = self.app.get('/')
@@ -52,30 +54,33 @@ class SkilledHammerTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 405)
 
         # POST is treated differently as it will trigger other security checks
-        with self.assertRaises(exceptions.SuspiciousOperation):
-            response = self.app.post('/')
-            self.assertEqual(response.status_code, 405)
+        response = self.app.post('/')
+        self.assertEqual(response.status_code, 500)
 
     def test_github_headers(self):
         invalid_headers = self.CLIENT_HEADERS
-        invalid_headers.pop('X_GITHUB_DELIVERY')
-        with self.assertRaises(exceptions.SuspiciousOperation):
-            self.app.post('/', headers=invalid_headers)
+        invalid_headers.pop('X-Github-Delivery')
+        response = self.app.post('/', headers=invalid_headers)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('Invalid HTTP headers', str(response.data))
 
         invalid_headers = self.CLIENT_HEADERS
-        invalid_headers.pop('USER_AGENT')
-        with self.assertRaises(exceptions.SuspiciousOperation):
-            self.app.post('/', headers=invalid_headers)
+        invalid_headers.pop('User-Agent')
+        response = self.app.post('/', headers=invalid_headers)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('Invalid HTTP headers', str(response.data))
 
         invalid_headers = self.CLIENT_HEADERS
-        invalid_headers.pop('X_GITHUB_EVENT')
-        with self.assertRaises(exceptions.SuspiciousOperation):
-            self.app.post('/', headers=invalid_headers)
+        invalid_headers.pop('X-Github-Event')
+        response = self.app.post('/', headers=invalid_headers)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('Invalid HTTP headers', str(response.data))
 
         invalid_headers = self.CLIENT_HEADERS
-        invalid_headers.pop('X_HUB_SIGNATURE')
-        with self.assertRaises(exceptions.SuspiciousOperation):
-            self.app.post('/', headers=invalid_headers)
+        invalid_headers.pop('X-Hub-Signature')
+        response = self.app.post('/', headers=invalid_headers)
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('Invalid HTTP headers', str(response.data))
 
     def test_payload(self):
         payload = {
@@ -86,8 +91,9 @@ class SkilledHammerTestCase(unittest.TestCase):
 
         self.sign(payload)
 
-        with self.assertRaises(exceptions.UnknownRepository):
-            self.app.post('/', data=json.dumps(payload), headers=self.CLIENT_HEADERS, content_type='application/json')
+        response = self.app.post('/', data=json.dumps(payload), headers=self.CLIENT_HEADERS, content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('Unknown repository', str(response.data))
 
     def test_no_repositories(self):
         app.config.update({
@@ -96,14 +102,15 @@ class SkilledHammerTestCase(unittest.TestCase):
 
         payload = {
             'repository': {
-                'url': 'https://github.com/baxterthehacker/public-repo'
+                'url': 'https://github.com/r00m/vigilant-octo'
             }
         }
 
         self.sign(payload)
 
-        with self.assertRaises(exceptions.UnknownRepository):
-            self.app.post('/', data=json.dumps(payload), headers=self.CLIENT_HEADERS, content_type='application/json')
+        response = self.app.post('/', data=json.dumps(payload), headers=self.CLIENT_HEADERS, content_type='application/json')
+        self.assertEqual(response.status_code, 500)
+        self.assertIn('Unknown repository', str(response.data))
 
 
 if __name__ == '__main__':
