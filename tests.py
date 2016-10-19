@@ -3,7 +3,11 @@ import hmac
 import json
 import unittest
 import logging
-from unittest.mock import patch
+
+try:
+    from unittest.mock import patch
+except:
+    from mock import patch # Python 2
 
 from app import app
 
