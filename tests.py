@@ -100,11 +100,11 @@ class SkilledHammerTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertIn('Invalid HTTP headers', str(response.data))
 
-    @patch('app.subprocess.call')
+    @patch('app.run')
     @patch('app.pull')
-    def test_github_payload(self, mock_pull, mock_subprocess_call):
+    def test_github_payload(self, mock_pull, mock_run):
         mock_pull.return_value = True
-        mock_subprocess_call.return_value = True
+        mock_run.return_value = True
 
         payload = {
             'repository': {
@@ -117,11 +117,11 @@ class SkilledHammerTestCase(unittest.TestCase):
         response = self.app.post('/', data=json.dumps(payload), headers=self.GITHUB_HEADERS, content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
-    @patch('app.subprocess.call')
+    @patch('app.run')
     @patch('app.pull')
-    def test_bitbucket_payload(self, mock_pull, mock_subprocess_call):
+    def test_bitbucket_payload(self, mock_pull, mock_run):
         mock_pull.return_value = True
-        mock_subprocess_call.return_value = True
+        mock_run.return_value = True
 
         payload = {
             'repository': {

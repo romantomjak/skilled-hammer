@@ -2,6 +2,8 @@ import hashlib
 import hmac
 import os
 import logging
+import subprocess
+import time
 
 import git
 
@@ -108,3 +110,31 @@ def pull(directory):
         os.seteuid(0)
 
     return True
+
+
+def run(command, directory):
+    """
+    Run the specified command as the user that owns the directory
+    """
+    try:
+        st = os.stat(directory)
+
+        # order is important: after seteuid() call the effective UID isn't 0 anymore, so seteuid() will not be allowed
+        os.setegid(st.st_uid)
+        os.seteuid(st.st_gid)
+
+        logger.info("Changing working directory to '{0}'".format(directory))
+        logger.info("Running '{0}' as {1}:{2}...".format(command, st.st_uid, st.st_gid))
+
+        start_time = time.time()
+        subprocess.check_output(command, shell=True, cwd=directory, stderr=subprocess.STDOUT)
+
+        logger.info("OK. Elapsed time: {0:.2f} seconds".format(time.time() - start_time))
+    except PermissionError:
+        logger.error("Insufficient permissions to set uid/gid")
+    except subprocess.CalledProcessError as e:
+        logger.error("Error: {0}".format(e.output))
+    finally:
+        logger.info("Restoring root permissions")
+        os.setegid(0)
+        os.seteuid(0)

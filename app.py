@@ -1,11 +1,10 @@
 import os
-import subprocess
 import logging
 
 from flask import Flask, request, jsonify
 
 from skilled_hammer import repositories, exceptions, log
-from skilled_hammer.utils import valid_http_headers, pull
+from skilled_hammer.utils import valid_http_headers, pull, run
 
 app = Flask(__name__)
 app.config.update({
@@ -35,9 +34,7 @@ def deploy():
             if repo['origin'] == url:
                 pull_succeeded = pull(repo['directory'])
                 if pull_succeeded and 'command' in repo:
-                    logger.info("Changing working directory to '{0}'".format(repo['directory']))
-                    logger.info("Running command: {0}".format(repo['command']))
-                    subprocess.call(repo['command'], shell=True, cwd=repo['directory'])
+                    run(repo['command'], repo['directory'])
                 break
 
         response = jsonify({'status': pull_succeeded})
