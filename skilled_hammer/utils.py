@@ -4,6 +4,7 @@ import os
 import logging
 import subprocess
 import time
+from threading import Thread
 
 import git
 
@@ -124,12 +125,22 @@ def run(command, directory):
         os.seteuid(st.st_gid)
 
         logger.info("Changing working directory to '{0}'".format(directory))
-        logger.info("Running '{0}' as {1}:{2}...".format(command, st.st_uid, st.st_gid))
+        logger.info("Spawning background command '{0}' as {1}:{2}...".format(command, st.st_uid, st.st_gid))
 
-        start_time = time.time()
-        subprocess.check_output(command, shell=True, cwd=directory, stderr=subprocess.STDOUT)
+        def background():
+            """
+            I don't care how long it takes to run the command, but Bitbucket gets angry when it takes longer
+            than 10 seconds. My npm build takes around 15 secs, so I'd get 3 Webhooks from Bitbucket, because
+            it thinks each Webhook timedout.
 
-        logger.info("OK. Elapsed time: {0:.2f} seconds".format(time.time() - start_time))
+            Easy way out is to return response immediately and start a background thread that
+            does all of the heavy lifting.
+            """
+            start_time = time.time()
+            subprocess.check_output(command, shell=True, cwd=directory, stderr=subprocess.STDOUT)
+            logger.info("Background command finished in {0:.2f} seconds".format(time.time() - start_time))
+
+        Thread(target=background).start()
     except PermissionError:
         logger.error("Insufficient permissions to set uid/gid")
     except subprocess.CalledProcessError as e:
