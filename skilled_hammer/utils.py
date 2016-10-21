@@ -171,7 +171,7 @@ def slack_notification(webhook_url, message, output):
                 "fallback": message,
                 "color": "#E8E8E8",
                 "title": "Console Output",
-                "text": output
+                "text": str(output, encoding='utf-8')
             },
         ]
     })
