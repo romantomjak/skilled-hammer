@@ -7,6 +7,7 @@ import time
 from threading import Thread
 
 import git
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -113,7 +114,7 @@ def pull(directory):
     return True
 
 
-def run(command, directory):
+def run(command, directory, slack_webhook_url):
     """
     Run the specified command as the user that owns the directory
     """
@@ -137,8 +138,13 @@ def run(command, directory):
             does all of the heavy lifting.
             """
             start_time = time.time()
-            subprocess.check_output(command, shell=True, cwd=directory, stderr=subprocess.STDOUT)
-            logger.info("Background command finished in {0:.2f} seconds".format(time.time() - start_time))
+            output = subprocess.check_output(command, shell=True, cwd=directory, stderr=subprocess.STDOUT)
+            completed_in = time.time() - start_time
+
+            logger.info("Background command finished in {0:.2f} seconds".format(completed_in))
+
+            if slack_webhook_url:
+                slack_notification(slack_webhook_url, "Build took {0:.2f} seconds :rocket:".format(completed_in), output)
 
         Thread(target=background).start()
     except PermissionError:
@@ -149,3 +155,23 @@ def run(command, directory):
         logger.info("Restoring root permissions")
         os.setegid(0)
         os.seteuid(0)
+
+
+def slack_notification(webhook_url, message, output):
+    """
+    Post a message to slack channel
+    """
+    requests.post(webhook_url, json={
+        "username": "Skilled Hammer",
+        "text": message,
+        "icon_emoji": ":bulb:",
+        "mrkdwn": True,
+        "attachments": [
+            {
+                "fallback": message,
+                "color": "#E8E8E8",
+                "title": "Console Output",
+                "text": output
+            },
+        ]
+    })

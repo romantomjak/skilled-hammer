@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/r00m/skilled-hammer.svg?branch=master)](https://travis-ci.org/r00m/skilled-hammer)
 
-Simple GitHub/Bitbucket Webhook deployments
+Simple GitHub/Bitbucket Webhook deployments (with [Slack integration](#slack-integration) :tada:)
 
 ---
 
@@ -11,11 +11,12 @@ Simple GitHub/Bitbucket Webhook deployments
 * Python 2.7 or 3.5
 * Flask
 * GitPython
-* Gunicorn (optional)
-* Supervisor (optional)
-* NGINX (optional)
 
-I say optional because they are not required to actually run the app, but they are needed when you deploy it in production.
+Optional requirements that are not required to run the app (required when deploying to production, though):
+
+* Gunicorn
+* Supervisor
+* NGINX
 
 For configuration examples see the `conf` folder.
 
@@ -80,6 +81,14 @@ and navigate to http://127.0.0.1:5000, to see that it worked and GET method is n
 **NB!** For production deployments set the `DEBUG` environment variable to `False`
 
 **NB!** For production deployments you will need to setup a WSGI server that can talk to an HTTP server. Here's a [tutorial on setting up Gunicorn, Supervisor and NGINX](https://r00m.wordpress.com/2016/03/05/deploying-flask-nginx-gunicorn-supervisor-for-the-first-time/).
+
+## Slack integration
+
+Add `SLACK_HOOK` environment variable to your supervisor configuration file:
+
+```
+--env SLACK_HOOK='YOUR_HOOK_URL_HERE'
+```
 
 ## Testing
 

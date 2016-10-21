@@ -11,6 +11,7 @@ app.config.update({
     'DEBUG': os.environ.get('DEBUG', True),
     'HAMMER_VERSION': "1.0.0",
     'HAMMER_SECRET': os.environ.get('HAMMER_SECRET', False),
+    'HAMMER_SLACK_HOOK': os.environ.get('SLACK_HOOK', False),
     'HAMMER_REPOSITORIES': repositories.load(),
 })
 log.setup()
@@ -34,7 +35,7 @@ def deploy():
             if repo['origin'] == url:
                 pull_succeeded = pull(repo['directory'])
                 if pull_succeeded and 'command' in repo:
-                    run(repo['command'], repo['directory'])
+                    run(repo['command'], repo['directory'], app.config['HAMMER_SLACK_HOOK'])
                 break
 
         response = jsonify({'status': pull_succeeded})
