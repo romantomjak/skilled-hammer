@@ -17,6 +17,7 @@ def load():
         parser.read("conf/repositories.conf")
         for section in parser.sections():
             data = {
+                'name': section,
                 'directory': parser.get(section, 'directory'),
                 'command': parser.get(section, 'command', fallback=None),
                 'origin': parser.get(section, 'origin'),

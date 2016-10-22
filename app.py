@@ -35,7 +35,7 @@ def deploy():
             if repo['origin'] == url:
                 pull_succeeded = pull(repo['directory'])
                 if pull_succeeded and 'command' in repo:
-                    run(repo['command'], repo['directory'], app.config['HAMMER_SLACK_HOOK'])
+                    run(repo['name'], repo['command'], repo['directory'], app.config['HAMMER_SLACK_HOOK'])
                 break
 
         response = jsonify({'status': pull_succeeded})

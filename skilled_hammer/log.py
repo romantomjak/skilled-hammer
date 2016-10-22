@@ -3,7 +3,7 @@ import logging.config
 
 def setup():
     logging.getLogger("requests").setLevel(logging.WARNING)
-    
+
     logging.config.dictConfig({
         'version': 1,
         'disable_existing_loggers': False,

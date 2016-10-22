@@ -114,7 +114,7 @@ def pull(directory):
     return True
 
 
-def run(command, directory, slack_webhook_url):
+def run(project, command, directory, slack_webhook_url):
     """
     Run the specified command as the user that owns the directory
     """
@@ -126,7 +126,7 @@ def run(command, directory, slack_webhook_url):
         os.seteuid(st.st_gid)
 
         logger.info("Changing working directory to '{0}'".format(directory))
-        logger.info("Spawning background command '{0}' as {1}:{2}...".format(command, st.st_uid, st.st_gid))
+        logger.info("Spawning background command '{0}' as {1}:{2} for '{3}'...".format(command, st.st_uid, st.st_gid, project))
 
         def background():
             """
@@ -141,10 +141,10 @@ def run(command, directory, slack_webhook_url):
             output = subprocess.check_output(command, shell=True, cwd=directory, stderr=subprocess.STDOUT)
             completed_in = time.time() - start_time
 
-            logger.info("Background command finished in {0:.2f} seconds".format(completed_in))
+            logger.info("'{0}' background command finished in {1:.2f} seconds".format(project, completed_in))
 
             if slack_webhook_url:
-                slack_notification(slack_webhook_url, "Build took {0:.2f} seconds :rocket:".format(completed_in), output)
+                slack_notification(slack_webhook_url, "Deployed `{0}` in {1:.2f} seconds! :rocket:".format(project, completed_in), output)
 
         Thread(target=background).start()
     except PermissionError:
