@@ -21,11 +21,13 @@ class SkilledHammerTestCase(unittest.TestCase):
             'TESTING': True,
             'HAMMER_REPOSITORIES': {
                 'https://github.com/r00m/vigilant-octo': {
+                    'name': 'vigilant-octo',
                     'origin': 'https://github.com/r00m/vigilant-octo',
                     'directory': '/var/www/vigilant-octo.org',
                     'command': 'supervisorctl restart vigilant-octo',
                 },
                 'https://bitbucket.org/bitbucket/bitbucket': {
+                    'name': 'bitbucket',
                     'origin': 'https://bitbucket.org/bitbucket/bitbucket',
                     'directory': '/var/www/bitbucket.org',
                     'command': 'supervisorctl restart bitbucket',
