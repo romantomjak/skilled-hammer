@@ -8,31 +8,32 @@ Simple GitHub/Bitbucket Webhook deployments (with [Slack integration](#slack-int
 
 ## Requirements
 
-* Python 2.7 or 3.5
-* Flask
-* GitPython
+* Docker
 
-Optional requirements that are not required to run the app (required when deploying to production, though):
+## Why did you create this?
 
-* Gunicorn
-* Supervisor
-* NGINX
+Does this look familiar?
 
-For configuration examples see the `conf` folder.
+```
+$ git commit -am "FIYAAA :fire:"
+$ ssh dev
+$ cd /var/www/my-project
+$ git pull origin develop
+$ [touch app.wsgi | cp -R dist/ public_html/ | ... ]
+```
 
-## Security
+Woudn't it be nice if you could just `commit`, `push` and get notified in [Slack](https://slack.com) once the change is deployed?
 
-All incoming requests are validated according to [GitHub's Webhook guidelines](https://developer.github.com/webhooks/#payloads) or [Bitbucket's Event Payloads](https://confluence.atlassian.com/bitbucket/event-payloads-740262817.html).
+## How does this work?
 
-**NB!** For projects hosted on GitHub, always setup `Secret` when creating a Webhook, it provides additional layer of security.
+You will need to setup a [Webhook](https://en.wikipedia.org/wiki/Webhook) that will get triggered every time you push a code change to [GitHub](https://github.com) / [Bitbucket](https://bitbucket.org). 
 
-## Why?
+`Skilled Hammer` will then take care of pulling the latest changes and running any additional commands you have defined. Usual suspects include:
 
-I got sick of logging into the server, pulling code and running any additional commands thereafter.
-
-## How?
-
-When you push code to GitHub/Bitbucket, a HTTP call is made to the URL where `Skilled Hammer` is listening on, which then takes care of pulling latest changes and running any additional commands like compiling sass, applying database migrations, copying static files or restarting services.
+- compiling sass
+- applying database migrations
+- copying static files
+- restarting services
 
 ## How do I add a Webhook?
 
@@ -41,6 +42,7 @@ When you push code to GitHub/Bitbucket, a HTTP call is made to the URL where `Sk
 Go to the repository `Settings`, in the left side menu click on `Webhooks` and then click on `Add webhook` button.
 
 The interesting bits here are:
+
 - Payload URL - that's where `Skilled Hammer` is listening on
 - Secret - this proves that request actually originated from GitHub's servers
 
@@ -50,51 +52,64 @@ Both need to be filled out!
 
 Go to the repository `Settings`, in the secondary menu click on `Webhooks` and then click on `Add webhook` button.
 
-## Installation
+## Configuration
 
-Easy mate, clone the repo and run:
+Configuration is stored in `repositories.conf` and this is how an example entry would look like:
 
 ```
-$ pip install -r requirements.txt
+[vigilant-octo]
+# the repository in question
+origin = https://github.com/r00m/vigilant-octo
+
+# working directory. this is where `git pull` and `command` are run from
+directory = /var/www/vigilant-octo.org
+
+# the command to run after a successfull `git pull`
+command = compass compile
 ```
 
-all sorted!
-
-**NB!** You should always use virtual environments (venv's) when installing python packages, [read on how and why](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
+**NB!** The command you are executing must exist in the Docker container. See [Dockerfile reference](https://docs.docker.com/engine/reference/builder/) on how to modify it.
 
 ## Running
 
-Copy example configuration and adjust it to your needs:
+**NB!** Make sure you have edited your `repositories.conf` :eyes:
+
+It's quite easy:
 
 ```
-$ cp conf/repositories.conf.example conf/repositories.conf
+docker run --restart=unless-stopped --name skilled-hammer \
+	-p "8000:8000" \
+	-e "HAMMER_SECRET=YOUR_SECRET_HERE" \
+	-v "$PWD/repositories.conf:/usr/src/app/repositories.conf" \
+	skilled-hammer
 ```
 
-For testing purposes you can use Flask's built-in development server:
+and navigate to [http://localhost:8000](http://localhost:8000), to see that it worked and GET method is not allowed :sweat_smile:
+
+### Slack integration
+
+Just add `SLACK_HOOK` environment variable:
 
 ```
-$ python app.py
-```
-
-and navigate to http://127.0.0.1:5000, to see that it worked and GET method is not allowed :sweat_smile:
-
-**NB!** For production deployments set the `DEBUG` environment variable to `False`
-
-**NB!** For production deployments you will need to setup a WSGI server that can talk to an HTTP server. Here's a [tutorial on setting up Gunicorn, Supervisor and NGINX](https://r00m.wordpress.com/2016/03/05/deploying-flask-nginx-gunicorn-supervisor-for-the-first-time/).
-
-## Slack integration
-
-Add `SLACK_HOOK` environment variable to your supervisor configuration file:
-
-```
---env SLACK_HOOK='YOUR_HOOK_URL_HERE'
+docker run --restart=unless-stopped --name skilled-hammer \
+	-p "8000:8000" \
+	-e "HAMMER_SECRET=YOUR_SECRET_HERE" \
+	-e "SLACK_HOOK= YOUR_HOOK_URL_HERE" \
+	-v "$PWD/repositories.conf:/usr/src/app/repositories.conf" \
+	skilled-hammer
 ```
 
 ## Testing
 
 ```
-$ python tests.py
+$ docker run skilled-hammer python skilled_hammer/tests.py
 ```
+
+## Security
+
+All incoming requests are validated according to [GitHub's Webhook guidelines](https://developer.github.com/webhooks/#payloads) or [Bitbucket's Event Payloads](https://confluence.atlassian.com/bitbucket/event-payloads-740262817.html).
+
+**NB!** For projects hosted on GitHub, always setup `Secret` when creating a Webhook, it provides additional layer of security.
 
 ## License
 
