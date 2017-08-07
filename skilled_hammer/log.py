@@ -10,7 +10,7 @@ def setup():
         'formatters': {
             'verbose': {
                 'format': '[%(asctime)s] %(levelname)s - %(message)s',
-                'datefmt': '%b %d %H:%M:%S'
+                'datefmt': '%Y-%m-%d %H:%M:%S %z'
             },
         },
         'handlers': {

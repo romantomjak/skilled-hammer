@@ -1,3 +1,5 @@
+
+
 class HammerException(Exception):
     """Base exception."""
 

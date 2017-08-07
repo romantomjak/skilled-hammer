@@ -8,7 +8,6 @@ from skilled_hammer.utils import valid_http_headers, pull, run
 
 app = Flask(__name__)
 app.config.update({
-    'DEBUG': os.environ.get('DEBUG', True),
     'HAMMER_VERSION': "1.0.0",
     'HAMMER_SECRET': os.environ.get('HAMMER_SECRET', False),
     'HAMMER_SLACK_HOOK': os.environ.get('SLACK_HOOK', False),
