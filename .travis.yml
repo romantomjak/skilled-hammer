@@ -3,5 +3,10 @@ cache: pip
 python:
   - "2.7"
   - "3.6"
-install: "pip install -r requirements.txt"
-script: python skilled_hammer/tests.py
+install:
+  - pip install -r requirements.txt
+  - pip install coveralls
+script:
+  - coverage run python test
+after_success:
+  - coveralls

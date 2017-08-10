@@ -1,6 +1,7 @@
 # Skilled Hammer
 
 [![Build Status](https://travis-ci.org/r00m/skilled-hammer.svg?branch=master)](https://travis-ci.org/r00m/skilled-hammer)
+[![Coverage Status](https://coveralls.io/repos/github/r00m/skilled-hammer/badge.svg?branch=master)](https://coveralls.io/github/r00m/skilled-hammer?branch=master)
 
 Simple GitHub/Bitbucket Webhook deployments (with [Slack integration](#slack-integration) :tada:)
 
