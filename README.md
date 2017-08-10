@@ -88,7 +88,7 @@ docker run --restart=unless-stopped --name skilled-hammer \
 	-p "8000:8000" \
 	-e "HAMMER_SECRET=YOUR_SECRET_HERE" \
 	-v "$PWD/repositories.conf:/usr/src/app/repositories.conf" \
-	skilled-hammer
+	r00m/skilled-hammer
 ```
 
 and navigate to [http://localhost:8000](http://localhost:8000), to see that it worked and GET method is not allowed :sweat_smile:
@@ -113,7 +113,7 @@ and start the app:
 $ gunicorn -b 0.0.0.0:8000 -w 4 --access-logfile=- wsgi:app
 ```
 
-**NB!** You should always use virtual environments (venv's) when installing python packages, [read on how and why](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
+**NB!** You should always use virtual environments (venv's) when installing python packages, read on [how and why](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 
 ## Slack integration
 
@@ -127,7 +127,7 @@ docker run --restart=unless-stopped --name skilled-hammer \
 	-e "HAMMER_SECRET=YOUR_SECRET_HERE" \
 	-e "SLACK_HOOK=YOUR_HOOK_URL_HERE" \
 	-v "$PWD/repositories.conf:/usr/src/app/repositories.conf" \
-	skilled-hammer
+	r00m/skilled-hammer
 ```
 
 ### When using VirtualEnv
@@ -145,7 +145,7 @@ then start the app:
 $ gunicorn -b 0.0.0.0:8000 -w 4 --access-logfile=- wsgi:app
 ```
 
-**NB!** You should always use virtual environments (venv's) when installing python packages, [read on how and why](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
+**NB!** You should always use virtual environments (venv's) when installing python packages, read on [how and why](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
 
 ## Testing
 
