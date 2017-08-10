@@ -5,7 +5,7 @@ except:
 
 from skilled_hammer import exceptions
 
-parser = configparser.ConfigParser()
+parser = configparser.ConfigParser(defaults={'command': None})
 
 
 def load():
@@ -19,7 +19,7 @@ def load():
             data = {
                 'name': section,
                 'directory': parser.get(section, 'directory'),
-                'command': parser.get(section, 'command', fallback=None),
+                'command': parser.get(section, 'command'),
                 'origin': parser.get(section, 'origin'),
             }
             repositories[data['origin']] = data

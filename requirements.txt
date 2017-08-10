@@ -2,3 +2,4 @@ Flask==0.12.2
 GitPython==2.1.5
 gunicorn==19.7.1
 requests==2.18.3
+mock==2.0.0
