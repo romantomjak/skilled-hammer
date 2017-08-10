@@ -7,9 +7,9 @@ import logging
 try:
     from unittest.mock import patch
 except:
-    from mock import patch # Python 2
+    from mock import patch  # Python 2
 
-from app import app
+from skilled_hammer.main import app
 
 logging.disable(logging.CRITICAL)
 
@@ -102,8 +102,8 @@ class SkilledHammerTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
         self.assertIn('Invalid HTTP headers', str(response.data))
 
-    @patch('app.run')
-    @patch('app.pull')
+    @patch('skilled_hammer.main.run')
+    @patch('skilled_hammer.main.pull')
     def test_github_payload(self, mock_pull, mock_run):
         mock_pull.return_value = True
         mock_run.return_value = True
@@ -119,8 +119,8 @@ class SkilledHammerTestCase(unittest.TestCase):
         response = self.app.post('/', data=json.dumps(payload), headers=self.GITHUB_HEADERS, content_type='application/json')
         self.assertEqual(response.status_code, 200)
 
-    @patch('app.run')
-    @patch('app.pull')
+    @patch('skilled_hammer.main.run')
+    @patch('skilled_hammer.main.pull')
     def test_bitbucket_payload(self, mock_pull, mock_run):
         mock_pull.return_value = True
         mock_run.return_value = True
