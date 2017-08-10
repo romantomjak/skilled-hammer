@@ -9,6 +9,10 @@ Simple GitHub/Bitbucket Webhook deployments (with [Slack integration](#slack-int
 
 ## Requirements
 
+Any of the following:
+
+* Python 2.7
+* Python 3.6
 * Docker
 
 ## Why did you create this?
@@ -29,12 +33,14 @@ Woudn't it be nice if you could just `commit`, `push` and get notified in [Slack
 
 You will need to setup a [Webhook](https://en.wikipedia.org/wiki/Webhook) that will get triggered every time you push a code change to [GitHub](https://github.com) / [Bitbucket](https://bitbucket.org). 
 
-`Skilled Hammer` will then take care of pulling the latest changes and running any additional commands you have defined. Usual suspects include:
+`Skilled Hammer` will then assume the privileges of the user that owns the folder and take care of pulling the latest changes and running any additional commands you have defined. Usual suspects include:
 
 - compiling sass
 - applying database migrations
 - copying static files
 - restarting services
+
+**NB!** If you are running a containerized version of `Skilled Hammer`, make sure the command exists in the Docker container environment. See [Dockerfile reference](https://docs.docker.com/engine/reference/builder/) on how to modify it.
 
 ## How do I add a Webhook?
 
@@ -69,11 +75,11 @@ directory = /var/www/vigilant-octo.org
 command = compass compile
 ```
 
-**NB!** The command you are executing must exist in the Docker container. See [Dockerfile reference](https://docs.docker.com/engine/reference/builder/) on how to modify it.
+**NB!** If you are running a containerized version of `Skilled Hammer`, make sure the command exists in the Docker container environment. See [Dockerfile reference](https://docs.docker.com/engine/reference/builder/) on how to modify it.
 
 ## Running
 
-**NB!** Make sure you have edited your `repositories.conf` :eyes:
+### Using Docker
 
 It's quite easy:
 
@@ -87,23 +93,64 @@ docker run --restart=unless-stopped --name skilled-hammer \
 
 and navigate to [http://localhost:8000](http://localhost:8000), to see that it worked and GET method is not allowed :sweat_smile:
 
-### Slack integration
+### Using VirtualEnv
 
-Just add `SLACK_HOOK` environment variable:
+Clone the repo, then install required packages using:
+
+```
+$ pip install -r requirements.txt
+```
+
+configure secrets:
+
+```
+$ export HAMMER_SECRET=YOUR_SECRET_HERE
+```
+
+and start the app:
+
+```
+$ gunicorn -b 0.0.0.0:8000 -w 4 --access-logfile=- wsgi:app
+```
+
+**NB!** You should always use virtual environments (venv's) when installing python packages, [read on how and why](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
+
+## Slack integration
+
+### When using Docker
+
+Just add `SLACK_HOOK` environment variable to the docker run command:
 
 ```
 docker run --restart=unless-stopped --name skilled-hammer \
 	-p "8000:8000" \
 	-e "HAMMER_SECRET=YOUR_SECRET_HERE" \
-	-e "SLACK_HOOK= YOUR_HOOK_URL_HERE" \
+	-e "SLACK_HOOK=YOUR_HOOK_URL_HERE" \
 	-v "$PWD/repositories.conf:/usr/src/app/repositories.conf" \
 	skilled-hammer
 ```
 
+### When using VirtualEnv
+
+Configure secrets like this:
+
+```
+$ export HAMMER_SECRET=YOUR_SECRET_HERE \
+	SLACK_HOOK=YOUR_HOOK_URL_HERE
+```
+
+then start the app:
+
+```
+$ gunicorn -b 0.0.0.0:8000 -w 4 --access-logfile=- wsgi:app
+```
+
+**NB!** You should always use virtual environments (venv's) when installing python packages, [read on how and why](http://docs.python-guide.org/en/latest/dev/virtualenvs/).
+
 ## Testing
 
 ```
-$ docker run skilled-hammer python skilled_hammer/tests.py
+$ python tests.py
 ```
 
 ## Security

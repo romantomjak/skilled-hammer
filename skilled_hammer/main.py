@@ -3,8 +3,11 @@ import logging
 
 from flask import Flask, request, jsonify
 
-from skilled_hammer import repositories, exceptions, log
-from skilled_hammer.utils import valid_http_headers, pull, run
+from . import repositories, exceptions, log
+from .utils import valid_http_headers, pull, run
+
+log.setup()
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config.update({
@@ -13,8 +16,6 @@ app.config.update({
     'HAMMER_SLACK_HOOK': os.environ.get('SLACK_HOOK', False),
     'HAMMER_REPOSITORIES': repositories.load(),
 })
-log.setup()
-logger = logging.getLogger(__name__)
 
 
 @app.route('/', methods=['POST'])
@@ -45,7 +46,3 @@ def deploy():
         response.status_code = 500
 
     return response
-
-
-if __name__ == "__main__":
-    app.run()

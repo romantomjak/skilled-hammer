@@ -68,7 +68,7 @@ def valid_github_http_headers(request):
         return False
 
     if 'X-Hub-Signature' in request.headers:
-        from app import app
+        from skilled_hammer.main import app
         if not app.config['HAMMER_SECRET']:
             logger.error("Webhook was configured to use a Secret, but 'HAMMER_SECRET' environment variable was not set")
             return False
@@ -161,6 +161,8 @@ def slack_notification(webhook_url, message, output):
     """
     Post a message to slack channel
     """
+    logger.info("POSTing a notification to Slack")
+
     requests.post(webhook_url, json={
         "username": "Skilled Hammer",
         "text": message,

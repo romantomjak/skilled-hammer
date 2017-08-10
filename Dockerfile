@@ -6,8 +6,9 @@ WORKDIR /usr/src/app
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
-COPY . .
+COPY skilled_hammer/ skilled_hammer/
+COPY wsgi.py wsgi.py
 
 EXPOSE 8000
 
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "-w", "4", "--access-logfile", "-", "skilled_hammer.main:app"]
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "-w", "4", "--access-logfile", "-", "wsgi:app"]

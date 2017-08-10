@@ -1,9 +1,9 @@
-from skilled_hammer import exceptions
-
 try:
     import configparser
 except:
     import ConfigParser as configparser  # Python 2
+
+from skilled_hammer import exceptions
 
 parser = configparser.ConfigParser()
 
@@ -14,7 +14,7 @@ def load():
     """
     try:
         repositories = {}
-        parser.read("conf/repositories.conf")
+        parser.read("repositories.conf")
         for section in parser.sections():
             data = {
                 'name': section,
